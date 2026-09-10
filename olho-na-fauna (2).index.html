@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Olho na Fauna — Leste de Mato Grosso do Sul</title>
+<meta name="description" content="Monitoramento colaborativo de onças e incêndios florestais no leste de Mato Grosso do Sul.">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--f:#173d2b;--f2:#28563e;--l:#789b58;--cream:#faf7ef;--sand:#eee4d0;--ink:#183027;--muted:#68766d;--line:#dce4dc;--orange:#d97832;--red:#c94739}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}a{color:inherit}
+.container{width:min(1180px,calc(100% - 32px));margin:auto}
+header{position:sticky;top:0;z-index:1000;background:#faf7eff2;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:900;color:var(--f)}
+.logo{width:42px;height:42px;border-radius:13px;background:var(--f);color:#fff;display:grid;place-items:center;font-size:21px}
+nav{display:flex;gap:22px}nav a{text-decoration:none;color:#56645c;font-size:.9rem;font-weight:750}.actions{display:flex;gap:8px}
+.btn{border:0;border-radius:11px;padding:11px 15px;font-weight:850;cursor:pointer}.primary{background:var(--f);color:#fff}.secondary{background:#e7efe4;color:var(--f)}.danger{background:var(--orange);color:#fff}
+.hero{background:var(--f);color:#fff;padding:70px 0 95px}.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:48px}.eyebrow{text-transform:uppercase;letter-spacing:.13em;font-size:.7rem;font-weight:900;color:var(--l)}
+h1,h2{font-family:Georgia,serif;font-weight:500}h1{font-size:clamp(2.7rem,6vw,5rem);line-height:.97;margin:12px 0 20px}.hero p{font-size:1.08rem;color:#dce8df;max-width:620px}.hero-buttons{display:flex;gap:10px;margin-top:25px;flex-wrap:wrap}.hero .primary{background:#fff;color:var(--f)}.hero .secondary{background:#315d46;color:#fff}
+.hero-art{height:340px;border-radius:28px;background:radial-gradient(circle at 68% 28%,#b99b67 0 4%,transparent 5%),linear-gradient(145deg,#7b9861,#294d38 60%,#132d23);position:relative;overflow:hidden;box-shadow:0 25px 60px #0004}.hero-art .animal{position:absolute;inset:0;display:grid;place-items:center;font-size:145px;filter:drop-shadow(0 18px 12px #0005)}.hero-art .label{position:absolute;left:18px;bottom:18px;background:#10291dcc;padding:14px;border-radius:14px}.label strong{display:block}.label small{color:#c8d8ce}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:-42px;position:relative;z-index:3}.stat{background:#fff;border:1px solid var(--line);padding:19px;border-radius:17px;box-shadow:0 12px 35px #153a2912}.stat b{font-size:1.5rem;color:var(--f);display:block}.stat span{font-size:.8rem;color:var(--muted)}
+section{padding:72px 0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:25px}h2{font-size:2.35rem;line-height:1.05;margin:7px 0}.lead{color:var(--muted);max-width:690px}
+.map-wrap{background:var(--sand);padding:26px 0 72px}.dashboard{display:grid;grid-template-columns:1.5fr .7fr;gap:18px}#map{height:560px;border-radius:23px;overflow:hidden;border:1px solid #cbd7c7;box-shadow:0 12px 40px #203c2812}.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:13px}.panel h3{margin:0 0 12px}.legend{display:grid;gap:9px}.legend div{font-size:.82rem;color:#59675e;display:flex;gap:8px;align-items:center}.dot{width:11px;height:11px;border-radius:50%}.info{background:#fff4df;border-color:#efd5af}.info strong{color:#9f4d1e}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.tab{border:1px solid #d5ded6;background:#fff;border-radius:999px;padding:9px 14px;font-weight:800;color:#536158;cursor:pointer}.tab.active{background:var(--f);color:#fff;border-color:var(--f)}
+.species-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.species{background:#fff;border:1px solid var(--line);border-radius:21px;overflow:hidden}.species-cover{height:190px;display:grid;place-items:center;font-size:100px;background:linear-gradient(135deg,#7e9967,#294e39)}.species-body{padding:20px}.species-body h3{margin:0 0 4px;font-family:Georgia,serif;font-size:1.55rem;font-weight:500}.latin{font-style:italic;color:var(--muted);font-size:.86rem}.species-body p{color:var(--muted);font-size:.9rem}.article{display:inline-flex;text-decoration:none;background:#e8f0e5;color:var(--f);padding:10px 12px;border-radius:10px;font-weight:850;font-size:.82rem}
+.alerts{background:#f2eadb}.fire-photo{height:220px;border-radius:20px;overflow:hidden;position:relative;margin:18px 0 20px;background:#7b4b2b}.fire-photo img{width:100%;height:100%;object-fit:cover}.fire-photo div{position:absolute;left:14px;right:14px;bottom:14px;color:#fff;background:#25170dcc;border-radius:10px;padding:10px;font-weight:800;font-size:.82rem}.alert-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.alert{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px}.alert h3{margin:0 0 7px}.alert p{color:var(--muted);font-size:.9rem}.badge{display:inline-block;padding:6px 9px;border-radius:999px;font-size:.68rem;font-weight:900;text-transform:uppercase}.fire{background:#fff0df;color:#a04d1e}.jag{background:#e8f0e4;color:var(--f)}
+.cta{background:var(--f);color:#fff;border-radius:25px;padding:40px;display:flex;justify-content:space-between;align-items:center;gap:25px}.cta h2{margin:0}.cta p{color:#cbdcd1}.cta .primary{background:#fff;color:var(--f)}
+footer{background:#10291e;color:#b9c9bf;padding:30px 0}.foot{display:flex;justify-content:space-between;gap:15px}.small{font-size:.78rem}
+ .photo{background-size:cover;background-position:center}
+.mini-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.mini-gallery div{position:relative;height:180px;border-radius:17px;overflow:hidden;background:#ddd}
+.mini-gallery img{width:100%;height:100%;object-fit:cover;display:block}
+.mini-gallery span{position:absolute;left:10px;right:10px;bottom:10px;background:#10291dcc;color:#fff;border-radius:9px;padding:7px 9px;font-size:.74rem;font-weight:800}
+@media(max-width:850px){nav{display:none}.hero-grid,.dashboard,.species-grid,.alert-grid{grid-template-columns:1fr}.hero-art{height:280px}.stats{grid-template-columns:repeat(2,1fr)}#map{height:450px}.section-head{align-items:flex-start;flex-direction:column}.mini-gallery{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.mini-gallery{grid-template-columns:1fr}}
+@media(max-width:520px){.container{width:calc(100% - 22px)}.actions .secondary{display:none}.stats{gap:8px}.stat{padding:14px}.stat b{font-size:1.25rem}section{padding:55px 0}}
+
+.ibge-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;transition:.18s}
+.ibge-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px #173d2b12}
+.ibge-card b{display:block;color:var(--f);font-size:1rem}
+.ibge-card span{font-size:.76rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<header><div class="container nav">
+<a class="brand" href="#"><span class="logo">🐆</span>Olho na Fauna</a>
+<nav><a href="#mapa">Mapa</a><a href="#dados-ibge">Dados IBGE</a><a href="#especies">Espécies</a><a href="#alertas">Incêndios</a></nav>
+<div class="actions"><button class="btn secondary" onclick="locate()">📍 Minha posição</button><button class="btn danger" onclick="showToast('Área de registro aberta no protótipo.')">+ Registrar ocorrência</button></div>
+</div></header>
+
+<main>
+<section class="hero"><div class="container hero-grid"><div>
+<div class="eyebrow">Leste de Mato Grosso do Sul</div>
+<h1>Onças, fogo e território em um só lugar.</h1>
+<p>Um painel de monitoramento para acompanhar registros de <b>onça-pintada</b>, <b>onça-parda</b> e ocorrências de incêndios florestais na região leste de Mato Grosso do Sul.</p>
+<div class="hero-buttons"><a class="btn primary" href="#mapa">Abrir mapa</a><a class="btn secondary" href="#especies">Conhecer as espécies</a></div>
+</div><div class="hero-art"><div class="animal">🐆</div><div class="label"><strong>Área de monitoramento</strong><small>Três Lagoas • Paranaíba • Aparecida do Taboado • Costa Rica e região</small></div></div>
+</div></section>
+
+<div class="container stats">
+<div class="stat"><b>MS Leste</b><span>recorte geográfico do projeto</span></div>
+<div class="stat"><b>2 espécies</b><span>onça-pintada e onça-parda</span></div>
+<div class="stat"><b>🔥 Focos</b><span>camada preparada para dados oficiais</span></div>
+<div class="stat"><b>Mapa real</b><span>OpenStreetMap + Leaflet</span></div>
+</div>
+
+<section id="mapa" class="map-wrap"><div class="container">
+<div class="section-head"><div><div class="eyebrow">Geovisualização</div><h2>Mapa do leste de MS</h2><p class="lead">Mapa interativo real, com base cartográfica do OpenStreetMap. Os pontos demonstrativos abaixo são apenas exemplos de interface e não representam ocorrências reais.</p></div><button class="btn secondary" onclick="fitArea()">Centralizar região</button></div>
+<div class="dashboard"><div id="map"></div><aside>
+<div class="panel"><h3>Camadas</h3><label style="display:block;margin:9px 0"><input type="checkbox" checked onchange="toggleLayer('jaguars',this.checked)"> 🐆 Registros de onças</label><label style="display:block;margin:9px 0"><input type="checkbox" checked onchange="toggleLayer('fires',this.checked)"> 🔥 Ocorrências de fogo</label></div>
+<div class="panel"><h3>Legenda</h3><div class="legend"><div><span class="dot" style="background:#173d2b"></span>Onça — registro demonstrativo</div><div><span class="dot" style="background:#d97832"></span>Fogo — ocorrência demonstrativa</div></div></div>
+<div class="panel info"><h3>⚠️ Segurança</h3><strong>Não divulgue a localização exata de onças.</strong><p>O sistema deve aplicar uma grade/raio de anonimização antes de publicar coordenadas sensíveis.</p></div>
+<div class="panel"><h3>Fontes cartográficas</h3><p style="font-size:.82rem;color:#69766e">A malha territorial oficial pode ser integrada a partir do IBGE; a base visual deste protótipo usa OpenStreetMap.</p></div>
+</aside></div>
+</div></section>
+
+
+<section id="dados-ibge" class="map-wrap" style="background:#f5f1e6">
+<div class="container">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">Dados territoriais oficiais</div>
+      <h2>Municípios do leste de MS</h2>
+      <p class="lead">A lista abaixo é carregada diretamente da API de Localidades do IBGE. Assim, nomes e códigos municipais permanecem alinhados à base oficial.</p>
+    </div>
+    <button class="btn secondary" onclick="loadIBGE()">↻ Atualizar IBGE</button>
+  </div>
+  <div class="panel" style="margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap">
+      <div><b id="ibgeStatus">Carregando dados do IBGE…</b><div id="ibgeDate" class="small">Fonte: IBGE — API de Localidades</div></div>
+      <input id="municipioSearch" oninput="filterMunicipios()" placeholder="Buscar município…" style="padding:11px;border:1px solid #d7dfd8;border-radius:10px;width:min(280px,100%)">
+    </div>
+  </div>
+  <div id="municipios" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"></div>
+</div>
+</section>
+
+<section id="especies"><div class="container">
+<div class="eyebrow">Guias das espécies</div><h2>Conheça as onças</h2><p class="lead">Cada cartão leva o visitante para conteúdo mais detalhado. Os links abaixo usam referências técnicas e científicas.</p>
+<div class="tabs"><button class="tab active" onclick="speciesTab('all',this)">Todas</button><button class="tab" onclick="speciesTab('jag',this)">Onça-pintada</button><button class="tab" onclick="speciesTab('puma',this)">Onça-parda</button></div>
+<div class="species-grid">
+<article class="species jag-card">
+  <div class="species-cover photo" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Jaguar_%28Panthera_onca_palustris%29_female_Piquiri_River_2.JPG/1280px-Jaguar_%28Panthera_onca_palustris%29_female_Piquiri_River_2.JPG')"></div>
+  <div class="species-body"><h3>Onça-pintada</h3><div class="latin">Panthera onca</div>
+  <p>Maior felino das Américas. No MS, a espécie é foco de estudos de conservação no Alto Rio Paraná e áreas vizinhas.</p>
+  <a class="article" target="_blank" rel="noopener" href="https://www.imasul.ms.gov.br/wp-content/uploads/2015/06/16-Conserva%C3%A7%C3%A3o_e_Manejo_de_Grandes_Felinos_2008-2009.pdf">Artigo curto ↗</a></div>
+</article>
+<article class="species puma-card">
+  <div class="species-cover photo" style="background-image:url('https://oncafari.org/wp-content/uploads/2021/02/Cre%CC%81dito_Luciano_Candizani-scaled.jpg')"></div>
+  <div class="species-body"><h3>Onça-parda</h3><div class="latin">Puma concolor</div>
+  <p>Felino adaptável que ocupa florestas, cerrado e áreas de transição. Também possui registros no Mato Grosso do Sul.</p>
+  <a class="article" target="_blank" rel="noopener" href="https://ojs.pubvet.com.br/index.php/revista/article/view/1199">Artigo curto ↗</a></div>
+</article>
+</div>
+<div class="mini-gallery">
+  <div><img src="https://wwfint.awsassets.panda.org/img/original/aline_santana_da_hora_wwf_brazil.jpg" alt="Onça-pintada em ambiente aquático"><span>Onça-pintada • habitat</span></div>
+  <div><img src="https://oncafari.org/wp-content/uploads/2021/02/Cre%CC%81dito_Luciano_Candizani-scaled.jpg" alt="Onça-parda na floresta"><span>Onça-parda • floresta</span></div>
+  <div><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Jaguar_%28Panthera_onca_palustris%29_female_Piquiri_River_2.JPG/1280px-Jaguar_%28Panthera_onca_palustris%29_female_Piquiri_River_2.JPG" alt="Onça-pintada no Pantanal"><span>Onça-pintada • Pantanal</span></div>
+</div></div></section>
+
+<section id="alertas" class="alerts"><div class="container"><div class="eyebrow">Monitoramento de risco</div><h2>Incêndios florestais</h2><p class="lead">A camada de incêndios deve ser alimentada por dados oficiais atualizados. Neste protótipo, os marcadores são apenas ilustrativos.</p>
+<div class="fire-photo"><img src="https://www.copernicus.eu/system/files/2023-11/image_day/20231127_Pantanal.jpg" alt="Incêndio florestal no Brasil"><div>Incêndios podem alterar habitat e deslocamento da fauna.</div></div>
+<div class="alert-grid"><div class="alert"><span class="badge fire">🔥 Fogo</span><h3>Focos de calor</h3><p>Preparado para receber uma camada/API de focos do INPE/Programa Queimadas e permitir filtros por período, município e intensidade.</p><a class="article" target="_blank" rel="noopener" href="https://www.gov.br/inpe/pt-br/acesso-a-informacao/perguntas-frequentes/principais-produtos-e-servicos-do-inpe/monitoramento-do-territorio-queimadas/monitoramento-do-territorio-queimadas">Fonte oficial: INPE ↗</a></div>
+<div class="alert"><span class="badge jag">🐆 Fauna</span><h3>Proteção de áreas de ocorrência</h3><p>Incêndios próximos a áreas de ocorrência de onças podem virar um alerta combinado, sem expor a localização exata dos animais.</p><button class="btn primary" onclick="showToast('Regra demonstrativa: fogo + área de fauna = alerta prioritário.')">Ver regra do alerta</button></div></div></div></section>
+
+<section><div class="container"><div class="cta"><div><div class="eyebrow" style="color:#b8d19f">Próxima etapa</div><h2>Transformar o protótipo em um painel de dados reais.</h2><p>Conectar INPE, IBGE, IMASUL e um banco de registros de fauna para atualização automática.</p></div><button class="btn primary" onclick="showToast('Arquitetura preparada para integração com APIs.')">Planejar integração</button></div></div></section>
+</main>
+<footer><div class="container foot"><div><b>🐆 Olho na Fauna</b><div class="small">Protótipo — Leste de Mato Grosso do Sul</div></div><div class="small">Cartografia: OpenStreetMap • Dados territoriais: IBGE • Ambiente: IMASUL • Fogo: INPE</div></div></footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const EASTERN_MS = new Set([
+"Água Clara","Aparecida do Taboado","Cassilândia","Chapadão do Sul",
+"Costa Rica","Inocência","Paranaíba","Ribas do Rio Pardo","Santa Rita do Pardo",
+"Selvíria","Três Lagoas","Brasilândia","Bataguassu","Anaurilândia",
+"Nova Andradina","Taquarussu","Batayporã"
+]);
+let ibgeMunicipios=[];
+async function loadIBGE(){
+  const status=document.getElementById('ibgeStatus');
+  const box=document.getElementById('municipios');
+  status.textContent='Consultando IBGE…';
+  try{
+    const r=await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/50/municipios');
+    if(!r.ok) throw new Error('IBGE indisponível');
+    const all=await r.json();
+    ibgeMunicipios=all.filter(x=>EASTERN_MS.has(x.nome)).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+    renderMunicipios(ibgeMunicipios);
+    status.textContent=`${ibgeMunicipios.length} municípios do recorte leste`;
+    document.getElementById('ibgeDate').textContent='Fonte: IBGE — API de Localidades • códigos oficiais dos municípios';
+  }catch(e){
+    status.textContent='Não foi possível atualizar agora.';
+    box.innerHTML='<div class="panel" style="grid-column:1/-1">A API do IBGE não respondeu. O mapa e as demais funções continuam disponíveis. Tente novamente em alguns instantes.</div>';
+  }
+}
+function renderMunicipios(list){
+  const box=document.getElementById('municipios');
+  box.innerHTML=list.map(m=>`<div class="ibge-card"><b>${m.nome}</b><span>IBGE: ${m.id} • UF: MS</span></div>`).join('');
+}
+function filterMunicipios(){
+  const q=document.getElementById('municipioSearch').value.toLowerCase().trim();
+  renderMunicipios(ibgeMunicipios.filter(m=>m.nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(q.normalize('NFD').replace(/[\u0300-\u036f]/g,''))));
+}
+loadIBGE();
+</script>
+<script>
+const map=L.map('map').setView([-20.78,-51.65],8);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
+const area=L.polygon([[-19.25,-52.45],[-19.25,-50.70],[-22.65,-50.70],[-22.65,-53.00]],{color:'#28563e',weight:2,fillColor:'#789b58',fillOpacity:.08}).addTo(map);
+const jaguars=L.layerGroup([
+L.marker([-20.48,-51.68]).bindPopup('<b>🐆 Registro demonstrativo</b><br>Onça-pintada — localização propositalmente aproximada.'),
+L.marker([-21.17,-51.92]).bindPopup('<b>🐆 Registro demonstrativo</b><br>Onça-pintada — localização propositalmente aproximada.')
+]).addTo(map);
+const fires=L.layerGroup([
+L.circle([-20.75,-51.62],{radius:6500,color:'#d97832',fillColor:'#d97832',fillOpacity:.22}).bindPopup('<b>🔥 Foco demonstrativo</b><br>Dados reais ainda não conectados.'),
+L.circle([-21.35,-52.05],{radius:4800,color:'#d97832',fillColor:'#d97832',fillOpacity:.22}).bindPopup('<b>🔥 Foco demonstrativo</b><br>Dados reais ainda não conectados.')
+]).addTo(map);
+function fitArea(){map.fitBounds(area.getBounds(),{padding:[20,20]})}
+function toggleLayer(n,on){(on?n==='jaguars'?jaguars:fires:n==='jaguars'?jaguars:fires);const layer=n==='jaguars'?jaguars:fires;if(on)layer.addTo(map);else map.removeLayer(layer)}
+function locate(){if(!navigator.geolocation){showToast('Geolocalização indisponível.');return}navigator.geolocation.getCurrentPosition(p=>{map.setView([p.coords.latitude,p.coords.longitude],13);L.circleMarker([p.coords.latitude,p.coords.longitude],{radius:8,color:'#173d2b'}).addTo(map).bindPopup('Sua posição aproximada').openPopup()},()=>showToast('Não foi possível obter sua localização.'))}
+function speciesTab(v,b){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelector('.jag-card').style.display=v==='puma'?'none':'block';document.querySelector('.puma-card').style.display=v==='jag'?'none':'block'}
+function showToast(m){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style='position:fixed;right:15px;bottom:15px;background:#173d2b;color:#fff;padding:14px 17px;border-radius:12px;z-index:3000;box-shadow:0 15px 40px #0003';document.body.appendChild(t)}t.textContent=m;clearTimeout(window.tt);t.style.display='block';window.tt=setTimeout(()=>t.style.display='none',3000)}
+</script>
+</body>
+</html>
